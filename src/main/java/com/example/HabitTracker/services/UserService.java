@@ -1,10 +1,12 @@
 package com.example.HabitTracker.services;
 
-import com.example.HabitHub.dto.UserDTO;
+import com.example.HabitTracker.dto.UserDTO;
+import com.example.HabitTracker.dto.LoginDTO;
 import com.example.HabitTracker.models.User;
 import com.example.HabitTracker.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
@@ -13,17 +15,40 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     // Create a new user
     public UserDTO createUser(UserDTO userDTO) {
         User user = new User();
         user.setEmail(userDTO.getEmail());
         user.setName(userDTO.getName());
+
+        // Hash the password before saving
+        String hashedPassword = passwordEncoder.encode(userDTO.getPasswordHash());
+        user.setPasswordHash(hashedPassword);
+
         user.setAvatar(userDTO.getAvatar());
-        user.setPasswordHash(userDTO.getPasswordHash()); // Set the password hash
 
         User savedUser = userRepository.save(user);
         return mapToDTO(savedUser);
+    }
+
+    public UserDTO login(LoginDTO loginDTO) {
+        Optional<User> userOptional = userRepository.findByEmail(loginDTO.getEmail());
+
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        User user = userOptional.get();
+
+        // Validate password (hashed)
+        if (!passwordEncoder.matches(loginDTO.getPassword(), user.getPasswordHash())) {
+            throw new RuntimeException("Invalid email or password");
+        }
+
+        return mapToDTO(user);
     }
 
     // Get a user by email
@@ -40,9 +65,6 @@ public class UserService {
             User user = existingUser.get();
             user.setName(userDTO.getName());
             user.setAvatar(userDTO.getAvatar());
-            if (userDTO.getPasswordHash() != null) {
-                user.setPasswordHash(userDTO.getPasswordHash()); // Update password if provided
-            }
             User updatedUser = userRepository.save(user);
             return mapToDTO(updatedUser);
         }
@@ -61,7 +83,6 @@ public class UserService {
         userDTO.setEmail(user.getEmail());
         userDTO.setName(user.getName());
         userDTO.setAvatar(user.getAvatar());
-        userDTO.setPasswordHash(user.getPasswordHash());
         return userDTO;
     }
 }

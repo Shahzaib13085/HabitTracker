@@ -1,4 +1,4 @@
-package com.example.HabitHub.dto;
+package com.example.HabitTracker.dto;
 
 public class UserDTO {
 

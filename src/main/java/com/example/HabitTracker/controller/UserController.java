@@ -1,6 +1,7 @@
 package com.example.HabitTracker.controller;
 
-import com.example.HabitHub.dto.UserDTO;
+import com.example.HabitTracker.dto.UserDTO;
+import com.example.HabitTracker.dto.LoginDTO;
 import com.example.HabitTracker.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,11 @@ public class UserController {
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userDTO) {
         UserDTO createdUser = userService.createUser(userDTO);
         return ResponseEntity.ok(createdUser);
+    }
+    @PostMapping("/login")
+    public ResponseEntity<UserDTO> loginUser(@RequestBody LoginDTO loginDTO) {
+        UserDTO userDTO = userService.login(loginDTO);
+        return ResponseEntity.ok(userDTO);
     }
 
     // Get a user by email
