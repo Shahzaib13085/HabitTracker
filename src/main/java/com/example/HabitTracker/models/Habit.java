@@ -22,6 +22,9 @@ public class Habit {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "completed")
+    private Boolean completed = false;
+
     private String status;
 
     @ManyToOne
@@ -112,5 +115,12 @@ public class Habit {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+    public Boolean getCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(Boolean completed) {
+        this.completed = completed;
     }
 }
