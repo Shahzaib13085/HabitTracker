@@ -15,6 +15,8 @@ public class HabitDTO {
     private Long categoryId;
     private String categoryName;
 
+    private Boolean completed;
+
     // Getters and Setters
     public Long getId() {
         return id;
@@ -95,5 +97,14 @@ public class HabitDTO {
     public void setCategoryId(Long categoryId) {
         this.categoryId = categoryId;
     }
+
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
 
 }

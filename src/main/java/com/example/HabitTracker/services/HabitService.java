@@ -8,8 +8,10 @@ import com.example.HabitTracker.repositories.CategoryRepository;
 import com.example.HabitTracker.repositories.HabitRepository;
 import com.example.HabitTracker.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +20,9 @@ public class HabitService {
 
     @Autowired
     private HabitRepository habitRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private UserRepository userRepository;
@@ -121,7 +126,32 @@ public class HabitService {
         habitDTO.setStatus(habit.getStatus());
         habitDTO.setUserEmail(habit.getUser().getEmail());
         habitDTO.setCategoryId(habit.getCategory().getId());
-
+        habitDTO.setCompleted(habit.getCompleted());
         return habitDTO;
+    }
+
+    public HabitDTO completeHabit(Long habitId) {
+        Habit habit = habitRepository.findById(habitId)
+                .orElseThrow(() -> new RuntimeException("Habit not found"));
+
+        habit.setCompleted(true);
+        Habit updatedHabit = habitRepository.save(habit);
+        return convertToDTO(updatedHabit);
+    }
+
+    @Scheduled(cron = "0 * * * * ?") // Every day at midnight
+    public void notifyUpcomingEndDate() {
+        LocalDate tomorrow = LocalDate.now().plusDays(1);
+
+        // Find habits that are due tomorrow and are not completed
+        List<Habit> habitsDueTomorrow = habitRepository.findByEndDateAndCompleted(tomorrow, false);
+
+        for (Habit habit : habitsDueTomorrow) {
+            notificationService.sendNotification(
+                    habit.getUser().getEmail(),
+                    "Reminder: Habit Due Tomorrow",
+                    "Your habit \"" + habit.getName() + "\" is due tomorrow. Please complete it to stay on track!"
+            );
+        }
     }
 }

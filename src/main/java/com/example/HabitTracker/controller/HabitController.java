@@ -26,4 +26,10 @@ public class HabitController {
         List<HabitDTO> habits = habitService.getHabitsForUser(email);
         return ResponseEntity.ok(habits);
     }
+
+    @PutMapping("/{habitId}/complete")
+    public ResponseEntity<HabitDTO> completeHabit(@PathVariable Long habitId) {
+        HabitDTO habitDTO = habitService.completeHabit(habitId);
+        return ResponseEntity.ok(habitDTO);
+    }
 }
