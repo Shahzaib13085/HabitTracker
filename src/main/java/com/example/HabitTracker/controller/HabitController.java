@@ -32,4 +32,16 @@ public class HabitController {
         HabitDTO habitDTO = habitService.completeHabit(habitId);
         return ResponseEntity.ok(habitDTO);
     }
+
+    @DeleteMapping("/{habitId}")
+    public ResponseEntity<String> deleteHabit(@PathVariable Long habitId) {
+        habitService.deleteHabit(habitId);
+        return ResponseEntity.ok("Habit deleted successfully.");
+    }
+
+    @PutMapping("/{habitId}")
+    public ResponseEntity<HabitDTO> updateHabit(@PathVariable Long habitId, @RequestBody HabitDTO habitDTO) {
+        HabitDTO updatedHabit = habitService.updateHabit(habitId, habitDTO);
+        return ResponseEntity.ok(updatedHabit);
+    }
 }
