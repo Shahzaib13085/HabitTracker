@@ -139,7 +139,7 @@ public class HabitService {
         return convertToDTO(updatedHabit);
     }
 
-    @Scheduled(cron = "0 * * * * ?") // Every day at midnight
+    @Scheduled(cron = "0 0 0 * * ?") // Every day at midnight
     public void notifyUpcomingEndDate() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
 
